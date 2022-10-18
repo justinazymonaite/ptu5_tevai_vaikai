@@ -53,17 +53,17 @@ def update_object(object_class, object_id, **kwargs):
         print(f"Klaida: {object_class.__name__} su ID:{object_id} neegzistuoja")
 
 # Testuojam
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # --- Ivaikinimo scenarijus
-    vaikas = session.query(Vaikas).filter(Vaikas.pavarde.ilike("Super%")).first()
-    tevas = session.query(Tevas).filter(Tevas.pavarde.ilike("Jan%")).first()
-    ivaikintas = update_object(Vaikas, vaikas.id, tevas=tevas, vardas="Ivaikintas")
-    print("Python objektas `ivaikintas`:\n", vaikas)
-    print("Perkraunam is DB:\n", read_vaikai())
+    # vaikas = session.query(Vaikas).filter(Vaikas.pavarde.ilike("Super%")).first()
+    # tevas = session.query(Tevas).filter(Tevas.pavarde.ilike("Jan%")).first()
+    # ivaikintas = update_object(Vaikas, vaikas.id, tevas=tevas, vardas="Ivaikintas")
+    # print("Python objektas `ivaikintas`:\n", vaikas)
+    # print("Perkraunam is DB:\n", read_vaikai())
 
     # --- Sukuriam superine seima, ir nutrinam teva
     # naujas_tevas = create_tevas("Tevas", "Superinis")
     # naujas_vaikas = create_vaikas("Vaikas", "Superinis", naujas_tevas)
     # print(read_vaikai())
-    # delete_object(Tevas, naujas_tevas.id)
+    # delete_object(Tevas, 6)
     # print(read_vaikai())
