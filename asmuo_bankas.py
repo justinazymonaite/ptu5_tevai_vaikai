@@ -10,6 +10,7 @@
 
 from models_asmuo_bankas import engine, Asmuo, Bankas, Saskaita
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
 session = sessionmaker(engine)()
 
@@ -63,9 +64,14 @@ while True:
                                 asmens_kodas=ivestas_asmens_kodas, 
                                 tel_nr=ivestas_tel_nr
                             )
-                            session.add(asmuo)
-                            session.commit()
-                            print(f"Naujas asmuo {asmuo} sukurtas sekmingai")
+                            try:
+                                session.add(asmuo)
+                                session.commit()
+                            except IntegrityError:
+                                print("KLAIDA: toks asmens kodas jau egzistuoja ")
+                                session.rollback()
+                            else:
+                                print(f"Naujas asmuo {asmuo} sukurtas sekmingai")
                     elif ivestis1 == 2:
                         print("----Naujas bankas----")
                         ivestas_pavadinimas = input("Pavadinimas: ")
@@ -151,6 +157,8 @@ while True:
                         saskaitos2 = session.query(Saskaita).all()
                         for saskaita in saskaitos2:
                             print(saskaita)
+                    else:
+                        print("KLAIDA: Blogas pasirinkimas, rinkites is naujo!") 
         elif ivestis == 3:
             # trecias submeniu
             while True:
@@ -185,7 +193,7 @@ while True:
                                 n_vardas = input(f"Vardas ({koreguojamas_asmuo.vardas}): ")
                                 n_pavarde = input(f"Pavarde ({koreguojamas_asmuo.pavarde}): ")
                                 try:
-                                    n_asmens_kodas = int(input(f"Asmens kodas ({koreguojamas_asmuo.asmens_kodas}): "))
+                                    n_asmens_kodas = int(input(f"Asmens kodas ({koreguojamas_asmuo.asmens_kodas}): " or 0))
                                 except ValueError:
                                     print("KLAIDA: asmens kodas turi buti skaicius")
                                 else:
@@ -256,29 +264,33 @@ while True:
                                     print("KLAIDA: saskaitos numeris turi buti skaicius")
                                 else:
                                     try:
-                                        n_balansas = float(input(f"Adresas ({koreguojama_saskaita.adresas}): "))
+                                        n_balansas = float(input(f"Balansas ({koreguojama_saskaita.balansas}): "))
                                     except ValueError:
                                         print("KLAIDA: balansas turi buti skaicius")
                                     else: 
                                         try:
-                                            n_asmuo_id = int(input(f"Banko kodas ({koreguojama_saskaita.asmuo_id}): "))
+                                            n_asmuo_id = int(input(f"Asmens ID ({koreguojama_saskaita.asmuo_id}): "))
                                         except ValueError:
-                                            print("KLAIDA: banko kodas turi buti skaicius")
+                                            print("KLAIDA: asmens ID turi buti skaicius")
                                         else:
-                                            n_bankas_id = input(f"SWIFT kodas ({koreguojama_saskaita.bankas_id}): ")
-                                if n_numeris:
-                                    koreguojama_saskaita.numeris = n_numeris
-                                if n_balansas:
-                                    koreguojama_saskaita.balansas = n_balansas
-                                if n_asmuo_id:
-                                    koreguojama_saskaita.asmuo_id = n_asmuo_id   
-                                if n_bankas_id:
-                                    koreguojama_saskaita.bankasn_bankas_id = n_bankas_id
-                            print(f"Saskaita {koreguojama_saskaita} atnaujinta sekmingai")
-                        else: 
-                            print("---Tokios saskaitos nera---")
-            else:
-                print("KLAIDA: Blogas pasirinkimas, rinkites is naujo!") 
+                                            try:
+                                                n_bankas_id = input(f"Banko ID ({koreguojama_saskaita.bankas_id}): ")
+                                            except ValueError:
+                                                print("KLAIDA: banko ID turi buti skaicius")
+                                            else:
+                                                if n_numeris:
+                                                    koreguojama_saskaita.numeris = n_numeris
+                                                if n_balansas:
+                                                    koreguojama_saskaita.balansas = n_balansas
+                                                if n_asmuo_id:
+                                                    koreguojama_saskaita.asmuo_id = n_asmuo_id   
+                                                if n_bankas_id:
+                                                    koreguojama_saskaita.bankasn_bankas_id = n_bankas_id
+                                                print(f"Saskaita {koreguojama_saskaita} atnaujinta sekmingai")
+                            else: 
+                                print("---Tokios saskaitos nera---")
+                    else:
+                        print("KLAIDA: Blogas pasirinkimas, rinkites is naujo!") 
         elif ivestis == 4:
             # ketvirtas submeniu
             while True:
@@ -425,5 +437,3 @@ while True:
                         print("KLAIDA: Blogas pasirinkimas, rinkites is naujo!")       
         else:
             print("KLAIDA: Blogas pasirinkimas, rinkites is naujo!")
-
-        
